@@ -1,7 +1,14 @@
 <div class="container">
     <div class="col-lg-8">
-        <div class="alert alert-danger"></div>
+        <div class="alert alert-danger" role="alert"></div>
+        <div class="alert alert-success" role="alert"></div>
         <form>                
+            <div class="form-row idDisable">
+                <div class="form-group col-md-12">
+                    <label for="inputID">ID</label>
+                    <input type="text" class="form-control" id="inputID" placeholder="ID" disabled>
+                </div>
+            </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="inputNombre">Nombre</label>
@@ -33,6 +40,8 @@
                 </div>
             </div>
             <button type="button" class="btn btn-primary" id="guardarContacto">Guardar</button>
+            <button type="button" class="btn btn-primary" id="editarContacto">Editar</button>
+            <button type="button" class="btn btn-danger" onclick="iniciarFormulario()">Limpiar</button>
         </form>        
 
     </div>

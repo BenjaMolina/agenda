@@ -83,6 +83,23 @@
             return $save;
         }
 
+        public function update()
+        {
+            $query = "UPDATE $this->table SET "
+                        ."nombre ='".$this->nombre."', "
+                        ."apellidos = '".$this->apellidos."', "
+                        ."email = '".$this->email."', "
+                        ."telefono = '".$this->telefono."', "
+                        ."estado = '".$this->estado."', "
+                        ."municipio = '".$this->municipio."'  "
+                        ."WHERE id = ".$this->id;
+            
+
+            $save = $this->db()->query($query);
+
+            return $save;
+        }
+
     }
 
 ?>

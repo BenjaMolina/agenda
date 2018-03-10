@@ -1,19 +1,96 @@
-
-
 function editar(id_contacto)
 {
+    $("#editarContacto").show();
+    $("#guardarContacto").hide();
+    $('.idDisable').show();
+
     var id = id_contacto;
-    console.log(id);
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: URL+ 'contactos/find',
+        data: {id: id},
+        success: (response) =>{
+            console.log(response);
+            $("#inputID").val(response.id);
+            $("#inputNombre").val(response.nombre);
+            $("#inputApellidos").val(response.apellidos);
+            $("#inputEmail").val(response.email);
+            $("#inputTelefono").val(response.telefono);
+            $("#inputMunicipio").empty();
+            $('#inputEstado').empty();
+
+            optionEstados(response.estado);
+
+            setTimeout(() => {
+                var estadoID = $('#inputEstado option:selected').val();
+                optionMunicipios(estadoID,response.municipio);
+            }, 200);
+            
+        },
+        error:(xhr, status) => {
+            //alert("Algo salio mal");
+            //console.log(status);
+            mostrarError("Contacto no encontrado");
+            setTimeout(() => {
+                $('.alert').css('display','none');
+            }, 2000);
+            
+        },
+    });
+
+}
+
+function eliminar(id_contacto)
+{
+    var id = id_contacto;
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: URL+ 'contactos/delete?id='+id,
+        success: (response) =>{
+            console.log(response);
+
+            if(response)
+            {                
+                cargarContactos();         
+                iniciarFormulario(); 
+                
+                mostrarSucces("Contacto Eliminado");
+                setTimeout(() => {
+                    $('.alert-success').css('display','none');
+                }, 2000);
+            }
+
+            
+        },
+        error:(xhr, status) => {
+            //alert("Algo salio mal");
+            //console.log(status);
+            mostrarError("No se pudo eliminar");
+            setTimeout(() => {
+                $('.alert').css('display','none');
+            }, 2000);
+            
+        },
+    });
 
 }
 
 function iniciarFormulario()
 {
     $('.alert-danger').css('display','none');
+    $('.alert-success').css('display','none');
+    
+    $('#editarContacto').hide();
+    $('#guardarContacto').show();
+    $('.idDisable').hide();
+    
 
     limpiarFormulario();
-    optionEstados(0);
-    optionMunicipios(1,0);
+    optionEstados("Aguascalientes");
+    optionMunicipios(1,"Aguascalientes");
 }
 
 function cargarContactos()
@@ -38,8 +115,8 @@ function cargarContactos()
                             "<td>"+contacto.telefono+"</td>"+
                             "<td>"+contacto.estado+"</td>"+
                             "<td>"+contacto.municipio+"</td>"+                            
-                            '<td><button type="button" class="btn btn-primary btnmodalContacto" onclick="editar('+contacto.id+')" data-toggle="modal" data-target="#modalContacto">Editar</button></td>'+
-                            '<td><button type="button" class="btn btn-danger">Eliminar</button></td>';
+                            '<td><button type="button" class="btn btn-primary" onclick="editar('+contacto.id+')" >Editar</button></td>'+
+                            '<td><button type="button" class="btn btn-danger"  onclick="eliminar('+contacto.id+')">Eliminar</button></td>';
                 tr.append(td);
                 tabla.after(tr);
             });
@@ -48,6 +125,18 @@ function cargarContactos()
             alert("Algo salio mal");
         },
     });
+}
+
+function mostrarError(mensaje)
+{
+    $('.alert-danger').html(mensaje);
+    $('.alert-danger').css('display','');
+}
+
+function mostrarSucces(mensaje)
+{
+    $('.alert-success').html(mensaje);
+    $('.alert-success').css('display','');
 }
 
 function optionMunicipios(id,seleccionar)
@@ -67,7 +156,7 @@ function optionMunicipios(id,seleccionar)
                 $('<option />', {
                     'value': response[i].id,
                     'text':  response[i].municipio,
-                    'selected': (i == seleccionar ? true : false)
+                    'selected': (response[i].municipio == seleccionar ? true : (i==0 ? true: false))
                 }).appendTo(municipio);
             }  
         },
@@ -79,7 +168,6 @@ function optionMunicipios(id,seleccionar)
 
 function optionEstados(seleccionar)
 {
-
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -90,9 +178,9 @@ function optionEstados(seleccionar)
             var dropDownList = document.getElementById('inputEstado');
             for (var i = 0; i< response.length ; ++i) {
                 $('<option />', {
-                    'value': response[i ].id,
-                    'text':  response[i ].estado,
-                    'selected': (i == seleccionar ? true : false)
+                    'value': response[i].id,
+                    'text':  response[i].estado,
+                    'selected': (response[i].estado == seleccionar ? true : (i==0 ? true: false))
                 }).appendTo(dropDownList);
             }  
         },
@@ -109,7 +197,7 @@ function limpiarFormulario()
     $("#inputApellidos").val('');
     $("#inputEmail").val('');
     $("#inputTelefono").val('');
-    $("#inputNombre").val('');
+    $("#inputMunicipio").empty();
     $('#inputEstado').empty();
 }
 
@@ -118,24 +206,53 @@ $(document).ready(function(){
     cargarContactos();
     iniciarFormulario();
 
-   /* $(".btnmodalContacto").click(function(){  
-        $('.alert').css('display','none');
-
-        limpiarFormulario();
-        optionEstados(0);
-        optionMunicipios(1,0);   
-        //$('.alert').alert();    
-    });*/
-
     $("#inputEstado").change(function(){
         var dropDownList = $("#inputEstado option:selected");
         var id = dropDownList.val();
 
-        optionMunicipios(id,0);
+        optionMunicipios(id,"Aguascalientes");
 
         //console.log(dropDownList.text());
         //console.log(dropDownList.val());
     });
+
+
+    $("#editarContacto").click(()=>{
+
+        var id = $("#inputID").val();
+        var nombre = $("#inputNombre").val();
+        var apellidos = $("#inputApellidos").val();
+        var email = $("#inputEmail").val();
+        var telefono = $("#inputTelefono").val();
+        var estado = $('#inputEstado option:selected').text();
+        var municipio = $('#inputMunicipio option:selected').text();
+
+        if(validar(id,nombre,apellidos,email,telefono,estado,municipio))
+        {
+            editarContacto(id,nombre,apellidos,email,telefono,estado,municipio);
+        }
+    });
+
+    function editarContacto(id,nombre,apellidos,email,telefono,estado,municipio)
+    {
+        $.ajax({
+            type: 'POST',
+            //dataType: 'json',
+            url: URL+ 'contactos/update?id='+id,
+            data:{nombre: nombre, apellidos: apellidos, email:email, telefono:telefono, estado:estado, municipio:municipio},
+            success: (response) =>{
+                console.log(response);
+                //cargarContactos();         
+                //iniciarFormulario();     
+            },
+            error:(xhr, status) => {
+                alert("NO Se puedo editar el contacto");
+                //console.log(response);
+            },
+        }); 
+    } 
+
+
 
     $("#guardarContacto").click(()=>{
 
@@ -146,7 +263,7 @@ $(document).ready(function(){
         var estado = $('#inputEstado option:selected').text();
         var municipio = $('#inputMunicipio option:selected').text();
 
-        if(validar(nombre,apellidos,email,telefono,estado,municipio))
+        if(validar(0,nombre,apellidos,email,telefono,estado,municipio))
         {
             guardarContactos(nombre,apellidos,email,telefono,estado,municipio);
         }
@@ -161,9 +278,14 @@ $(document).ready(function(){
             data:{nombre: nombre, apellidos: apellidos, email:email, telefono:telefono, estado:estado, municipio:municipio},
             success: (response) =>{
                 console.log(response);
-                $('#modalContacto').modal('hide');
                 cargarContactos();         
-                iniciarFormulario();     
+                iniciarFormulario(); 
+
+                mostrarSucces("Contacto Guardado");
+
+                setTimeout(() => {
+                    $('.alert-success').css('display','none');
+                }, 2500);
             },
             error:(xhr, status) => {
                 alert("Algo salio mal");
@@ -171,42 +293,36 @@ $(document).ready(function(){
         }); 
     }    
 
-    function validar(nombre,apellidos,email,telefono,estado,municipio)
+    function validar(id,nombre,apellidos,email,telefono,estado,municipio)
     {
         if(!nombre)
         {
-            $('.alert').html("Escriba un nombre porfavor");
-            $('.alert').css('display','');
+            mostrarError("Escriba un nombre porfavor");
             return false; 
         }
         if(!apellidos)
         {
-            $('.alert').html("Escriba sus apellidos");
-            $('.alert').css('display','');
+            mostrarError("Escriba sus apellidos");
             return false; 
         }
         if(!email)
         {
-            $('.alert').html("Escriba un email");
-            $('.alert').css('display','');
+            mostrarError("Escriba un email");
             return false; 
         }
         if(!telefono)
         {
-            $('.alert').html("Escriba un telefono");
-            $('.alert').css('display','');
+            mostrarError("Escriba un telefono");
             return false; 
         }
         if(!municipio)
         {
-            $('.alert').html("Elija un municipio");
-            $('.alert').css('display','');
+            mostrarError("Elija un municipio");
             return false; 
         }
         if(!estado)
         {
-            $('.alert').html("Elija un estado");
-            $('.alert').css('display','');
+            mostrarError("Elija un estado");
             return false; 
         }
         

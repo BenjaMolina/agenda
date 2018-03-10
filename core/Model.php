@@ -37,11 +37,14 @@
         public function getById($id){
             $query=$this->db->query("SELECT * FROM $this->table WHERE id =$id");
             
-            $resulSet;
-
             if($row = $query->fetch_object()){
                 $resulSet = $row;
             }
+            else
+            {
+                $resulSet = [];
+            }
+            
 
             return $resulSet;
         }

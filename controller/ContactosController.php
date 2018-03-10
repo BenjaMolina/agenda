@@ -40,8 +40,8 @@
                 $apellidos = $_POST["apellidos"];
                 $email = $_POST["email"];
                 $telefono = $_POST["telefono"];
-                $estado = $_POST["municipio"];
-                $municipio = $_POST["estado"];
+                $estado = $_POST["estado"];
+                $municipio = $_POST["municipio"];
 
                 $contacto->setNombre($nombre);
                 $contacto->setApellidos($apellidos);
@@ -55,6 +55,69 @@
             else
             {
                 echo 0;
+            }
+        }
+
+        public function find()
+        {
+            if(isset($_POST["id"]))
+            {
+                $id = $_POST["id"];
+
+                $c = new Contacto();
+                $contacto = $c->getById($id);
+
+                echo json_encode($contacto);
+                
+                
+            }
+        }
+
+        public function update()
+        {
+            if(isset($_GET["id"]))
+            {
+                $id = (int) $_GET["id"];                
+
+                $c = new Contacto();
+                $find = $c->getById($id);
+                
+                
+                if(count($find) > 0)
+                {
+                    $contacto = new Contacto();
+                    $nombre = $_POST["nombre"];
+                    $apellidos = $_POST["apellidos"];
+                    $email = $_POST["email"];
+                    $telefono = $_POST["telefono"];
+                    $estado = $_POST["estado"];
+                    $municipio = $_POST["municipio"];
+
+                    $contacto->setId($id);
+                    $contacto->setNombre($nombre);
+                    $contacto->setApellidos($apellidos);
+                    $contacto->setEmail($email);
+                    $contacto->setTelefono($telefono);
+                    $contacto->setEstado($estado);
+                    $contacto->setMunicipio($municipio);
+
+                    echo ($contacto->update());
+                }
+
+            }
+        }
+
+        public function delete()
+        {
+            if(isset($_GET["id"]))
+            {
+                $id = (int)$_GET["id"];
+
+                $c = new Contacto();
+                $contacto = $c->deletById($id);
+
+                echo ($contacto);
+                
             }
         }
     }
