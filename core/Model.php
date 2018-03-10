@@ -22,6 +22,7 @@
             return $this->db;
         }
 
+
         public function getAll(){
             $query=$this->db->query("SELECT * FROM $this->table ORDER BY id ASC");
             
@@ -89,18 +90,18 @@
                 else if($query->num_rows == 1)
                 {
                     if($row = $query->fetch_object()){
-                        $resulSet = $row;
+                        $resulSet[] = $row;
                     }
 
                 }
                 else
                 {
-                    $resulSet = false;
+                    $resulSet = [];
                 }
             }
             else
             {
-                $resulSet = false;
+                $resulSet = [];
             }
 
             return $resulSet;

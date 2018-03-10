@@ -18,5 +18,5 @@
     {
         $controllerObj = cargarControlador(CONTROLADOR_DEFECTO,$accion);
     }
-    
+
 ?>

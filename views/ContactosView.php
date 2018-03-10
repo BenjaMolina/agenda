@@ -1,4 +1,6 @@
 <div class="container">
+    <h2>CONTACTOS</h2>
+    <br>
     <div class="col-lg-8">
         <div class="alert alert-danger" role="alert"></div>
         <div class="alert alert-success" role="alert"></div>

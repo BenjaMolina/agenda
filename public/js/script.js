@@ -40,6 +40,77 @@ function editar(id_contacto)
     });
 
 }
+function editarCita(idCita)
+{
+    $("#editarCita").show();
+    $("#guardarCita").hide();
+    $('.idDisable').show();
+
+    var id = idCita;
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: URL+ 'citas/find',
+        data: {id: id},
+        success: (response) =>{
+            console.log(response);
+            $("#citaID").val(response.id);
+            $("#citaAsunto").val(response.asunto);
+            $("#citaFecha").val(response.fecha);
+            $("#citaHora").val(response.hora);
+            $("#inputContactos").empty();
+
+            optionContactos(response.id_contactos);
+            
+        },
+        error:(xhr, status) => {
+            //alert("Algo salio mal");
+            //console.log(status);
+            mostrarError("Contacto no encontrado");
+            setTimeout(() => {
+                $('.alert').css('display','none');
+            }, 2000);
+            
+        },
+    });
+
+}
+
+function eliminarCita(id_contacto)
+{
+    var id = id_contacto;
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: URL+ 'citas/delete?id='+id,
+        success: (response) =>{
+            console.log(response);
+            if(response)
+            {                
+                getCitas();         
+                iniciarFormulario(); 
+
+                mostrarSucces("Cita Eliminada");
+                setTimeout(() => {
+                    $('.alert-success').css('display','none');
+                }, 2000);
+            }
+
+            
+        },
+        error:(xhr, status) => {
+            //alert("Algo salio mal");
+            //console.log(status);
+            mostrarError("No se pudo eliminar");
+            setTimeout(() => {
+                $('.alert').css('display','none');
+            }, 2000);
+            
+        },
+    });
+
+}
 
 function eliminar(id_contacto)
 {
@@ -56,7 +127,7 @@ function eliminar(id_contacto)
             {                
                 cargarContactos();         
                 iniciarFormulario(); 
-                
+
                 mostrarSucces("Contacto Eliminado");
                 setTimeout(() => {
                     $('.alert-success').css('display','none');
@@ -95,7 +166,7 @@ function iniciarFormulario()
 
 function cargarContactos()
 {
-    $(".table tr:not(:first-child)").remove();
+    $(".tabla-contactos tr:not(:first-child)").remove();
 
     $.ajax({
         type: 'GET',
@@ -150,7 +221,7 @@ function optionMunicipios(id,seleccionar)
         url: URL+ 'estados/getMunicipios?id='+id,
         success: (response) =>{
             //alert("bien");
-            console.log(response);
+            //console.log(response);
 
             for (var i = 0; i< response.length ; ++i) {
                 $('<option />', {
@@ -174,7 +245,7 @@ function optionEstados(seleccionar)
         url: URL+ 'Estados/index',
         success: (response) =>{
             //alert("bien");
-            console.log(response);
+            //console.log(response);
             var dropDownList = document.getElementById('inputEstado');
             for (var i = 0; i< response.length ; ++i) {
                 $('<option />', {
@@ -199,12 +270,103 @@ function limpiarFormulario()
     $("#inputTelefono").val('');
     $("#inputMunicipio").empty();
     $('#inputEstado').empty();
+
+    $("#citaAsunto").val('');
+    $("#inputContactos").empty();
+    
+    /*var hour = new Date().getHours() + ":" + + new Date().getMinutes();
+    console.log(hour);*/
+    //$("#citaHora").val(hour);
 }
+
+
+/*----------------------------
+    CITAS
+-----------------------*/
+
+function getCitas()
+{
+    $(".tabla-citas tr:not(:first-child)").remove();
+
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: URL+ 'citas/citas',
+        success: (response) =>{
+            console.log(response);
+            var tabla = $('.tabla-citas tr:last');         
+                    
+            response.map((citas)=>{
+                //console.log(citas);
+                var tr = $('<tr/>'); 
+                var td = "<td>"+citas.id+"</td>"+
+                            "<td>"+citas.asunto+"</td>"+
+                            "<td>"+(citas.estatus == 0 ? 'Pendiente' : 'Finalizado')+"</td>"+
+                            "<td>"+citas.fecha+"</td>"+
+                            "<td>"+citas.hora+"</td>"+                            
+                            "<td>"+citas.nombre+"</td>"+                            
+                            '<td><button type="button" class="btn btn-primary" onclick="editarCita('+citas.id+')" >Editar</button></td>'+
+                            '<td><button type="button" class="btn btn-danger"  onclick="eliminarCita('+citas.id+')">Eliminar</button></td>';
+                tr.append(td);
+                tabla.after(tr);
+            });
+        },
+        error:(xhr, status) => {
+            alert("Algo salio mal");
+        },
+    });
+
+}
+
+function iniciarFormCitas()
+{
+    $('.alert-danger').css('display','none');
+    $('.alert-success').css('display','none');
+    
+    $('#editarCita').hide();
+    $('#guardarCita').show();
+    $('.idDisable').hide();
+    
+    limpiarFormulario();
+    optionContactos(0);
+
+}
+
+function optionContactos(seleccionar)
+{
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: URL+ 'citas/getContactos',
+        success: (response) =>{
+            console.log(response);
+            var dropDownList = document.getElementById('inputContactos');
+
+            for (var i = 0; i< response.length ; ++i) {
+                $('<option />', {
+                    'value': response[i].id,
+                    'text':  response[i].nombre + " "+response[i].apellidos ,
+                    'selected': (response[i].id==seleccionar ? true: false)
+                }).appendTo(dropDownList);
+            }  
+        },
+        error:(xhr, status) => {
+            alert("Algo salio mal");
+        },
+    });
+}
+
+
+
+
+
 
 $(document).ready(function(){
 
     cargarContactos();
     iniciarFormulario();
+    getCitas();
+    iniciarFormCitas();
 
     $("#inputEstado").change(function(){
         var dropDownList = $("#inputEstado option:selected");
@@ -217,6 +379,56 @@ $(document).ready(function(){
     });
 
 
+    $("#editarCita").click(()=>{
+
+        var id = $("#citaID").val();
+        var asunto = $("#citaAsunto").val();
+        var fecha = $("#citaFecha").val();
+        var hora = $("#citaHora").val();
+        var id_usuario = $('#inputContactos option:selected').val();
+
+        /*console.log(id);
+        console.log(fecha);
+        console.log(hora);
+        console.log(id_usuario);
+        return;*/
+
+        if(validarCita(id,asunto,fecha,hora,id_usuario))
+        {
+            editarCita(id,asunto,fecha,hora,id_usuario);
+        }
+    });
+
+    function editarCita(id,asunto,fecha,hora,id_usuario)
+    {
+
+        $.ajax({
+            type: 'POST',
+            //dataType: 'json',
+            url: URL+ 'citas/update',
+            data:{id:id,asunto: asunto, fecha: fecha, hora:hora, id_usuario:id_usuario},
+            success: (response) =>{
+                console.log(response);
+
+                if(response)
+                {
+                    getCitas();         
+                    iniciarFormulario(); 
+
+                    mostrarSucces("Cita Editada");
+
+                    setTimeout(() => {
+                        $('.alert-success').css('display','none');
+                    }, 2500);
+                }
+                
+            },
+            error:(xhr, status) => {
+                alert("Algo salio mal");
+            },
+        }); 
+    } 
+    
     $("#editarContacto").click(()=>{
 
         var id = $("#inputID").val();
@@ -242,8 +454,14 @@ $(document).ready(function(){
             data:{nombre: nombre, apellidos: apellidos, email:email, telefono:telefono, estado:estado, municipio:municipio},
             success: (response) =>{
                 console.log(response);
-                //cargarContactos();         
-                //iniciarFormulario();     
+                cargarContactos();         
+                iniciarFormulario();    
+                
+                mostrarSucces("Contacto editado");
+
+                setTimeout(() => {
+                    $('.alert-success').css('display','none');
+                }, 2500);
             },
             error:(xhr, status) => {
                 alert("NO Se puedo editar el contacto");
@@ -251,7 +469,6 @@ $(document).ready(function(){
             },
         }); 
     } 
-
 
 
     $("#guardarContacto").click(()=>{
@@ -269,6 +486,49 @@ $(document).ready(function(){
         }
     });
 
+    $("#guardarCita").click(()=>{
+
+        var asunto = $("#citaAsunto").val();
+        var fecha = $("#citaFecha").val();
+        var hora = $("#citaHora").val() + ":00";
+        var id_usuario = $('#inputContactos option:selected').val();
+
+        /*console.log(fecha);
+        console.log(hora);
+        console.log(id_usaurio);
+        return;*/
+
+        if(validarCita(0,asunto,fecha,hora,id_usuario))
+        {
+            guardarCita(asunto,fecha,hora,id_usuario);
+        }
+    });
+
+    function guardarCita(asunto,fecha,hora,id_usuario)
+    {
+        $.ajax({
+            type: 'POST',
+            //dataType: 'json',
+            url: URL+ 'citas/crear',
+            data:{asunto: asunto, fecha: fecha, hora:hora, id_usuario:id_usuario},
+            success: (response) =>{
+                console.log(response);
+                getCitas();         
+                iniciarFormulario(); 
+
+                mostrarSucces("Cita Guardada");
+
+                setTimeout(() => {
+                    $('.alert-success').css('display','none');
+                }, 2500);
+            },
+            error:(xhr, status) => {
+                alert("Algo salio mal");
+            },
+        }); 
+    }    
+
+
     function guardarContactos(nombre,apellidos,email,telefono,estado,municipio)
     {
         $.ajax({
@@ -277,7 +537,7 @@ $(document).ready(function(){
             url: URL+ 'contactos/crear',
             data:{nombre: nombre, apellidos: apellidos, email:email, telefono:telefono, estado:estado, municipio:municipio},
             success: (response) =>{
-                console.log(response);
+                //console.log(response);
                 cargarContactos();         
                 iniciarFormulario(); 
 
@@ -292,6 +552,33 @@ $(document).ready(function(){
             },
         }); 
     }    
+
+    function validarCita(id,asunto,fecha,hora,id_usuario)
+    {
+        if(!asunto)
+        {
+            mostrarError("Escriba el Asunto");
+            return false; 
+        }
+        if(!fecha)
+        {
+            mostrarError("Escoja una fecha");
+            return false; 
+        }
+        if(!hora)
+        {
+            mostrarError("Escoja la hora");
+            return false; 
+        }
+        if(!id_usuario)
+        {
+            mostrarError("Escoja a un contacto");
+            return false; 
+        }
+        
+        $('.alert').css('display','none');
+        return true;
+    }
 
     function validar(id,nombre,apellidos,email,telefono,estado,municipio)
     {
@@ -330,3 +617,6 @@ $(document).ready(function(){
         return true;
     }
 });
+
+
+

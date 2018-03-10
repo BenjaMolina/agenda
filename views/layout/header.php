@@ -29,8 +29,8 @@
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Agenda <span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Citas</a></li>
+        <li><a href="<?php echo urlBase(); ?>contactos">Contactos <span class="sr-only">(current)</span></a></li>
+        <li><a href="<?php echo urlBase(); ?>citas">Citas</a></li>
         <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
           <ul class="dropdown-menu">
