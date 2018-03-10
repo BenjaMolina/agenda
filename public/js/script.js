@@ -1,15 +1,131 @@
-$(document).ready(function(){
-    //var URL = "http://localhost/agenda/";
-    //$("#hah").text(estados[0]["estado"]);
 
-    $("#nuevoContact").click(function(){  
+
+function editar(id_contacto)
+{
+    var id = id_contacto;
+    console.log(id);
+
+}
+
+function iniciarFormulario()
+{
+    $('.alert-danger').css('display','none');
+
+    limpiarFormulario();
+    optionEstados(0);
+    optionMunicipios(1,0);
+}
+
+function cargarContactos()
+{
+    $(".table tr:not(:first-child)").remove();
+
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: URL+ 'contactos/contactos',
+        success: (response) =>{
+            //console.log(response);
+            var tabla = $('.tabla-contactos tr:last');         
+                    
+            response.map((contacto)=>{
+                //console.log(contacto);
+                var tr = $('<tr/>'); 
+                var td = "<td>"+contacto.id+"</td>"+
+                            "<td>"+contacto.nombre+"</td>"+
+                            "<td>"+contacto.apellidos+"</td>"+
+                            "<td>"+contacto.email+"</td>"+
+                            "<td>"+contacto.telefono+"</td>"+
+                            "<td>"+contacto.estado+"</td>"+
+                            "<td>"+contacto.municipio+"</td>"+                            
+                            '<td><button type="button" class="btn btn-primary btnmodalContacto" onclick="editar('+contacto.id+')" data-toggle="modal" data-target="#modalContacto">Editar</button></td>'+
+                            '<td><button type="button" class="btn btn-danger">Eliminar</button></td>';
+                tr.append(td);
+                tabla.after(tr);
+            });
+        },
+        error:(xhr, status) => {
+            alert("Algo salio mal");
+        },
+    });
+}
+
+function optionMunicipios(id,seleccionar)
+{
+    var municipio = $('#inputMunicipio'); 
+    municipio.empty();
+    
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: URL+ 'estados/getMunicipios?id='+id,
+        success: (response) =>{
+            //alert("bien");
+            console.log(response);
+
+            for (var i = 0; i< response.length ; ++i) {
+                $('<option />', {
+                    'value': response[i].id,
+                    'text':  response[i].municipio,
+                    'selected': (i == seleccionar ? true : false)
+                }).appendTo(municipio);
+            }  
+        },
+        error:(xhr, status) => {
+            alert("Algo salio mal");
+        },
+    }); 
+}
+
+function optionEstados(seleccionar)
+{
+
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: URL+ 'Estados/index',
+        success: (response) =>{
+            //alert("bien");
+            console.log(response);
+            var dropDownList = document.getElementById('inputEstado');
+            for (var i = 0; i< response.length ; ++i) {
+                $('<option />', {
+                    'value': response[i ].id,
+                    'text':  response[i ].estado,
+                    'selected': (i == seleccionar ? true : false)
+                }).appendTo(dropDownList);
+            }  
+        },
+        error:(xhr, status) => {
+            alert("Algo salio mal");
+        },
+    }); 
+}
+
+
+function limpiarFormulario()
+{
+    $("#inputNombre").val('');
+    $("#inputApellidos").val('');
+    $("#inputEmail").val('');
+    $("#inputTelefono").val('');
+    $("#inputNombre").val('');
+    $('#inputEstado').empty();
+}
+
+$(document).ready(function(){
+
+    cargarContactos();
+    iniciarFormulario();
+
+   /* $(".btnmodalContacto").click(function(){  
         $('.alert').css('display','none');
 
         limpiarFormulario();
         optionEstados(0);
         optionMunicipios(1,0);   
         //$('.alert').alert();    
-    });
+    });*/
 
     $("#inputEstado").change(function(){
         var dropDownList = $("#inputEstado option:selected");
@@ -22,9 +138,6 @@ $(document).ready(function(){
     });
 
     $("#guardarContacto").click(()=>{
-        $(".table-responsiv").clear();
-        $('#modalContacto').modal('hide');
-        return;
 
         var nombre = $("#inputNombre").val();
         var apellidos = $("#inputApellidos").val();
@@ -49,14 +162,14 @@ $(document).ready(function(){
             success: (response) =>{
                 console.log(response);
                 $('#modalContacto').modal('hide');
-
+                cargarContactos();         
+                iniciarFormulario();     
             },
             error:(xhr, status) => {
                 alert("Algo salio mal");
             },
         }); 
-    }
-    
+    }    
 
     function validar(nombre,apellidos,email,telefono,estado,municipio)
     {
@@ -99,68 +212,5 @@ $(document).ready(function(){
         
         $('.alert').css('display','none');
         return true;
-    }
-
-    function optionMunicipios(id,seleccionar)
-    {
-        var municipio = $('#inputMunicipio'); 
-        municipio.empty();
-        
-        $.ajax({
-            type: 'GET',
-            dataType: 'json',
-            url: URL+ 'estados/getMunicipios?id='+id,
-            success: (response) =>{
-                //alert("bien");
-                console.log(response);
-
-                for (var i = 0; i< response.length ; ++i) {
-                    $('<option />', {
-                        'value': response[i ].id,
-                        'text':  response[i ].municipio,
-                        'selected': (i == seleccionar ? true : false)
-                    }).appendTo(municipio);
-                }  
-            },
-            error:(xhr, status) => {
-                alert("Algo salio mal");
-            },
-        }); 
-    }
-
-    function optionEstados(seleccionar)
-    {
-
-        $.ajax({
-            type: 'GET',
-            dataType: 'json',
-            url: URL+ 'Estados/index',
-            success: (response) =>{
-                //alert("bien");
-                console.log(response);
-                var dropDownList = document.getElementById('inputEstado');
-                for (var i = 0; i< response.length ; ++i) {
-                    $('<option />', {
-                        'value': response[i ].id,
-                        'text':  response[i ].estado,
-                        'selected': (i == seleccionar ? true : false)
-                    }).appendTo(dropDownList);
-                }  
-            },
-            error:(xhr, status) => {
-                alert("Algo salio mal");
-            },
-        }); 
-    }
-
-
-    function limpiarFormulario()
-    {
-        $("#inputNombre").val('');
-        $("#inputApellidos").val('');
-        $("#inputEmail").val('');
-        $("#inputTelefono").val('');
-        $("#inputNombre").val('');
-        $('#inputEstado').empty();
     }
 });

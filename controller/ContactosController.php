@@ -21,6 +21,14 @@
             ));
 
         }
+        public function contactos()
+        {
+            $contactos = new Contacto();
+            $todos = $contactos->getAll();
+
+            echo json_encode($todos);
+
+        }
 
         public function crear()
         {
