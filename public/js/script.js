@@ -352,14 +352,13 @@ function mostrarSucces(mensaje)
     $('.alert-success').css('display','');
 }
 
-function optionMunicipios(id,seleccionar, async = true)
+function optionMunicipios(id,seleccionar)
 {
     var municipio = $('#inputMunicipio'); 
     municipio.empty();
     
     $.ajax({
         type: 'GET',
-        async: async,
         dataType: 'json',
         url: URL+ 'estados/getMunicipios?id='+id,
         success: (response) =>{
@@ -380,11 +379,10 @@ function optionMunicipios(id,seleccionar, async = true)
     }); 
 }
 
-function optionEstados(seleccionar,async = true)
+function optionEstados(seleccionar)
 {
     $.ajax({
         type: 'GET',
-        async: async,
         dataType: 'json',
         url: URL+ 'Estados/index',
         success: (response) =>{
