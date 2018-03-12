@@ -138,12 +138,18 @@ function editar(id_contacto)
             $("#inputMunicipio").empty();
             $('#inputEstado').empty();
 
-            optionEstados(response.estado);
+            /*optionEstados(response.estado, false);
+            
+            var estadoID = $('#inputEstado option:selected').val();
+            optionMunicipios(estadoID,response.municipio,false);*/
 
-            setTimeout(() => {
+            optionEstadosEditar(response.estado, response.municipio);
+
+            /*setTimeout(() => {
+                console.log("SetTimeout");
                 var estadoID = $('#inputEstado option:selected').val();
                 optionMunicipios(estadoID,response.municipio);
-            }, 200);
+            }, 1000);*/
             
         },
         error:(xhr, status) => {
@@ -346,13 +352,14 @@ function mostrarSucces(mensaje)
     $('.alert-success').css('display','');
 }
 
-function optionMunicipios(id,seleccionar)
+function optionMunicipios(id,seleccionar, async = true)
 {
     var municipio = $('#inputMunicipio'); 
     municipio.empty();
     
     $.ajax({
         type: 'GET',
+        async: async,
         dataType: 'json',
         url: URL+ 'estados/getMunicipios?id='+id,
         success: (response) =>{
@@ -373,7 +380,33 @@ function optionMunicipios(id,seleccionar)
     }); 
 }
 
-function optionEstados(seleccionar)
+function optionEstados(seleccionar,async = true)
+{
+    $.ajax({
+        type: 'GET',
+        async: async,
+        dataType: 'json',
+        url: URL+ 'Estados/index',
+        success: (response) =>{
+            //alert("bien");
+            //console.log(response);
+            var dropDownList = document.getElementById('inputEstado');
+            for (var i = 0; i< response.length ; ++i) {
+                $('<option />', {
+                    'value': response[i].id,
+                    'text':  response[i].estado,
+                    'selected': (response[i].estado == seleccionar ? true : (i==0 ? true: false))
+                }).appendTo(dropDownList);
+            }  
+        },
+        error:(xhr, status) => {
+            alert("Algo salio mal");
+        },
+    }); 
+}
+
+
+function optionEstadosEditar(seleccionar, municipio)
 {
     $.ajax({
         type: 'GET',
@@ -390,6 +423,9 @@ function optionEstados(seleccionar)
                     'selected': (response[i].estado == seleccionar ? true : (i==0 ? true: false))
                 }).appendTo(dropDownList);
             }  
+
+            var estadoID = $('#inputEstado option:selected').val();
+            optionMunicipios(estadoID,municipio);
         },
         error:(xhr, status) => {
             alert("Algo salio mal");
