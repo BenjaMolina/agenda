@@ -1,3 +1,23 @@
+var idContactos_eliminar = 0;
+var idCitas_eliminar = 0;
+
+
+
+function showModalContactos(id_contacto)
+{
+    idContactos_eliminar = id_contacto;    
+    idCitas_eliminar = 0;
+    
+    $('#aceptarCancel').modal('show');
+}
+function showModalCitas(id_cita)
+{
+    idCitas_eliminar  = id_cita;    
+    idContactos_eliminar = 0;
+    
+    $('#aceptarCancel').modal('show');
+}
+
 
 function filtroFecha()
 {
@@ -217,7 +237,9 @@ function eliminarCita(id_contacto)
 
 function eliminar(id_contacto)
 {
-    var id = id_contacto;
+    var id =  id_contacto;
+
+    console.log(id_contacto);
 
     $.ajax({
         type: 'POST',
@@ -287,7 +309,7 @@ function cargarContactos()
                 response.map((contacto)=>{
                     //console.log(contacto);
                     var tr = $('<tr/>'); 
-                    var td = "<td>"+contacto.id+"</td>"+
+                    var td = //"<td>"+contacto.id+"</td>"+
                                 "<td>"+contacto.nombre+"</td>"+
                                 "<td>"+contacto.apellidos+"</td>"+
                                 "<td>"+contacto.email+"</td>"+
@@ -295,7 +317,7 @@ function cargarContactos()
                                 "<td>"+contacto.estado+"</td>"+
                                 "<td>"+contacto.municipio+"</td>"+                            
                                 '<td><button type="button" class="btn btn-primary" onclick="editar('+contacto.id+')" >Editar</button></td>'+
-                                '<td><button type="button" class="btn btn-danger"  onclick="eliminar('+contacto.id+')">Eliminar</button></td>';
+                                '<td><button type="button" class="btn btn-danger"  onclick="showModalContactos('+contacto.id+')">Eliminar</button></td>';
                     tr.append(td);
                     tabla.after(tr);
                 });
@@ -413,14 +435,14 @@ function getCitas()
             response.map((citas)=>{
                 //console.log(citas);
                 var tr = $('<tr/>'); 
-                var td = "<td>"+citas.id+"</td>"+
+                var td = //"<td>"+citas.id+"</td>"+
                             "<td>"+citas.asunto+"</td>"+
                             "<td>"+(citas.estatus == 0 ? 'Pendiente' : 'Finalizado')+"</td>"+
                             "<td>"+citas.fecha+"</td>"+
                             "<td>"+citas.hora+"</td>"+                            
                             "<td>"+citas.nombre+"</td>"+                            
                             '<td><button type="button" class="btn btn-primary" onclick="editarCita('+citas.id+')" >Editar</button></td>'+
-                            '<td><button type="button" class="btn btn-danger"  onclick="eliminarCita('+citas.id+')">Eliminar</button></td>';
+                            '<td><button type="button" class="btn btn-danger"  onclick="showModalCitas('+citas.id+')">Eliminar</button></td>';
                 tr.append(td);
                 tabla.after(tr);
             });
@@ -490,6 +512,30 @@ $(document).ready(function(){
     getCitas();
     iniciarFormCitas();
 
+    
+
+    $('#aceptarEliminar' ).click(function() {
+
+       if(idContactos_eliminar)
+       {
+            console.log("Id contacbtos :" +idContactos_eliminar);
+            eliminar(idContactos_eliminar);
+
+       }
+       if(idCitas_eliminar)
+       {           
+            console.log("Id citas :" +idCitas_eliminar);
+            eliminarCita(idCitas_eliminar);
+       }
+
+       $('#aceptarCancel').modal('hide');
+
+       idContactos_eliminar = 0;
+       idCitas_eliminar = 0;
+       
+    });
+
+    
     $('#check' ).on( 'click', function() {
         if( $(this).is(':checked') ){
             $('#searchFinals').removeAttr('disabled');

@@ -33,7 +33,7 @@
             </div>
             <button type="button" class="btn btn-primary" id="guardarCita">Guardar</button>
             <button type="button" class="btn btn-primary" id="editarCita">Editar</button>
-            <button type="button" class="btn btn-danger" onclick="iniciarFormCitas()">Limpiar</button>
+            <button type="button" class="btn btn-danger" onclick="iniciarFormCitas()">Cancelar</button>
         </form>        
 
     </div>
@@ -66,7 +66,7 @@
         </center>
         <table class="table table-responsive tabla-citas">
             <tr>
-                <td>ID</td>
+                <!--<td>ID</td>-->
                 <td>Asunto</td>
                 <td>Estatus</td>
                 <td>Fecha</td>

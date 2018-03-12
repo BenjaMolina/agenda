@@ -43,18 +43,17 @@
             </div>
             <button type="button" class="btn btn-primary" id="guardarContacto">Guardar</button>
             <button type="button" class="btn btn-primary" id="editarContacto">Editar</button>
-            <button type="button" class="btn btn-danger" onclick="iniciarFormulario()">Limpiar</button>
+            <button type="button" class="btn btn-danger" onclick="iniciarFormulario()">Cancelar</button>
         </form>        
 
     </div>
     <div class="col-lg-9" style="margin-top:30px">
-        <!--<button id="nuevoContact" type="button" class="btn btn-primary btnmodalContacto" data-toggle="modal" data-target="#modalContacto">Nuevo Contacto</button>-->
         <center>
             <div class="col-sm-6 col-md-7">
                 <h2><label class="label label-info">LISTA DE CONTACTOS</label></h2> 
             </div>
             <div class="col-sm-6 col-md-5">
-                <input type="text" class="form-control" id="buscarContact" placeholder="Search (id,nombre,apellidos)" onKeyPress="searchContact(this.value)" onKeyUp="searchContact(this.value)">
+                <input type="text" class="form-control" id="buscarContact" placeholder="Buscar Contacto (nombre,apellidos)" onKeyPress="searchContact(this.value)" onKeyUp="searchContact(this.value)">
             </div>
                    
             
@@ -62,7 +61,6 @@
         
         <table class="table table-responsive tabla-contactos">
             <tr>
-                <td>ID</td>
                 <td>Nombre</td>
                 <td>Apellidos</td>
                 <td>Email</td>
