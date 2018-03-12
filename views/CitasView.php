@@ -38,10 +38,31 @@
 
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-lg-12" style="margin-top:30px">
         <!--<button id="nuevoContact" type="button" class="btn btn-primary btnmodalContacto" data-toggle="modal" data-target="#modalContacto">Nuevo Contacto</button>-->
         <center>
-            <h2><label class="label label-info">LISTA DE CITAS</label></h2>
+            <div class="col-sm-12 col-md-12 col-lg-4">
+                <h2><label class="label label-info">LISTA DE CITAS</label></h2> 
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-8">
+                <div class="form-row">
+                    <div class="form-group col-md-4 col-xs-2">
+                        <div class="checkbox">
+                            <label><input type="checkbox" id="check" value="">Filtrar por Fecha</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4 col-xs-5">
+                        <label for="citaHora">fecha de incio</label>
+                        <input type="date" class="form-control" id="searchInicio" value="<?php echo date("Y-m-d");?>" onchange="filtroFecha()">
+                    </div>
+                    <div class="form-group col-md-4 col-xs-5">
+                        <label for="citaContacto">fecha final</label>
+                        <input type="date" class="form-control" id="searchFinals" value="<?php echo date("Y-m-d");?>" onchange="filtroFecha()">
+                    </div>
+                </div>
+            </div>
+                   
+            
         </center>
         <table class="table table-responsive tabla-citas">
             <tr>

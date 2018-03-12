@@ -1,3 +1,101 @@
+
+function filtroFecha()
+{
+    var inicio = $("#searchInicio").val();
+    var fin = $("#searchFinals").val();
+    
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: URL+ 'citas/filtroFecha',
+        data: {inicio: inicio, fin:fin},
+        success: (response) =>{
+            console.log(response);
+
+            $(".tabla-citas tr:not(:first-child)").remove();
+            var tabla = $('.tabla-citas tr:last');         
+                    
+            response.map((citas)=>{
+                //console.log(citas);
+                var tr = $('<tr/>'); 
+                var td = "<td>"+citas.id+"</td>"+
+                            "<td>"+citas.asunto+"</td>"+
+                            "<td>"+(citas.estatus == 0 ? 'Pendiente' : 'Finalizado')+"</td>"+
+                            "<td>"+citas.fecha+"</td>"+
+                            "<td>"+citas.hora+"</td>"+                            
+                            "<td>"+citas.nombre+"</td>"+                            
+                            '<td><button type="button" class="btn btn-primary" onclick="editarCita('+citas.id+')" >Editar</button></td>'+
+                            '<td><button type="button" class="btn btn-danger"  onclick="eliminarCita('+citas.id+')">Eliminar</button></td>';
+                tr.append(td);
+                tabla.after(tr);
+            });
+        },                      
+        error:(xhr, status) => {
+            //alert("Algo salio mal");
+            //console.log(status);
+            mostrarError("Algo salio mal");
+            setTimeout(() => {
+                $('.alert').css('display','none');
+            }, 2000);
+            
+        },
+    });
+
+
+
+}
+
+
+function searchContact(buscar)
+{   
+    //var buscar = $(".buscarContact").val();
+    var buscar = buscar;
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: URL+ 'contactos/search',
+        data: {buscar: buscar},
+        success: (response) =>{
+            console.log(response);
+
+            $(".tabla-contactos tr:not(:first-child)").remove();     
+            var tabla = $('.tabla-contactos tr:last');                        
+            response.map((contacto)=>{
+                //console.log(contacto);
+                var tr = $('<tr/>'); 
+                var td = "<td>"+contacto.id+"</td>"+
+                            "<td>"+contacto.nombre+"</td>"+
+                            "<td>"+contacto.apellidos+"</td>"+
+                            "<td>"+contacto.email+"</td>"+
+                            "<td>"+contacto.telefono+"</td>"+
+                            "<td>"+contacto.estado+"</td>"+
+                            "<td>"+contacto.municipio+"</td>"+                            
+                            '<td><button type="button" class="btn btn-primary" onclick="editar('+contacto.id+')" >Editar</button></td>'+
+                            '<td><button type="button" class="btn btn-danger"  onclick="eliminar('+contacto.id+')">Eliminar</button></td>';
+                tr.append(td);
+                tabla.after(tr);
+            });
+
+            
+        },
+        error:(xhr, status) => {
+            //alert("Algo salio mal");
+            //console.log(status);
+            mostrarError("Algo salio mal");
+            setTimeout(() => {
+                $('.alert').css('display','none');
+            }, 2000);
+            
+        },
+    });
+
+
+}
+
+
+
 function editar(id_contacto)
 {
     $("#editarContacto").show();
@@ -88,8 +186,13 @@ function eliminarCita(id_contacto)
             console.log(response);
             if(response)
             {                
-                getCitas();         
-                iniciarFormulario(); 
+                if(!$("#check").is(':checked')){
+                    getCitas();
+                }
+                else{
+                    filtroFecha();
+                }                
+                iniciarFormCitas(); 
 
                 mostrarSucces("Cita Eliminada");
                 setTimeout(() => {
@@ -167,35 +270,46 @@ function iniciarFormulario()
 function cargarContactos()
 {
     $(".tabla-contactos tr:not(:first-child)").remove();
+    var buscar = document.getElementById('buscarContact');
 
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: URL+ 'contactos/contactos',
-        success: (response) =>{
-            //console.log(response);
-            var tabla = $('.tabla-contactos tr:last');         
-                    
-            response.map((contacto)=>{
-                //console.log(contacto);
-                var tr = $('<tr/>'); 
-                var td = "<td>"+contacto.id+"</td>"+
-                            "<td>"+contacto.nombre+"</td>"+
-                            "<td>"+contacto.apellidos+"</td>"+
-                            "<td>"+contacto.email+"</td>"+
-                            "<td>"+contacto.telefono+"</td>"+
-                            "<td>"+contacto.estado+"</td>"+
-                            "<td>"+contacto.municipio+"</td>"+                            
-                            '<td><button type="button" class="btn btn-primary" onclick="editar('+contacto.id+')" >Editar</button></td>'+
-                            '<td><button type="button" class="btn btn-danger"  onclick="eliminar('+contacto.id+')">Eliminar</button></td>';
-                tr.append(td);
-                tabla.after(tr);
-            });
-        },
-        error:(xhr, status) => {
-            alert("Algo salio mal");
-        },
-    });
+    buscar ? buscar = buscar.value : buscar = "";
+
+    if(!buscar)
+    {
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: URL+ 'contactos/contactos',
+            success: (response) =>{
+                //console.log(response);
+                var tabla = $('.tabla-contactos tr:last');         
+                        
+                response.map((contacto)=>{
+                    //console.log(contacto);
+                    var tr = $('<tr/>'); 
+                    var td = "<td>"+contacto.id+"</td>"+
+                                "<td>"+contacto.nombre+"</td>"+
+                                "<td>"+contacto.apellidos+"</td>"+
+                                "<td>"+contacto.email+"</td>"+
+                                "<td>"+contacto.telefono+"</td>"+
+                                "<td>"+contacto.estado+"</td>"+
+                                "<td>"+contacto.municipio+"</td>"+                            
+                                '<td><button type="button" class="btn btn-primary" onclick="editar('+contacto.id+')" >Editar</button></td>'+
+                                '<td><button type="button" class="btn btn-danger"  onclick="eliminar('+contacto.id+')">Eliminar</button></td>';
+                    tr.append(td);
+                    tabla.after(tr);
+                });
+            },
+            error:(xhr, status) => {
+                alert("Algo salio mal");
+            },
+        });
+    }
+    else
+    {
+        searchContact(buscar);
+    }
+    
 }
 
 function mostrarError(mensaje)
@@ -326,6 +440,14 @@ function iniciarFormCitas()
     $('#editarCita').hide();
     $('#guardarCita').show();
     $('.idDisable').hide();
+
+    if(!$("#check").is(':checked')){
+        console.log("no checked");
+        $('#searchInicio').attr('disabled','disabled');
+        $('#searchFinals').attr('disabled','disabled');
+    }
+    
+    //$('#searchFinals').removeAttr('disabled');
     
     limpiarFormulario();
     optionContactos(0);
@@ -367,6 +489,21 @@ $(document).ready(function(){
     iniciarFormulario();
     getCitas();
     iniciarFormCitas();
+
+    $('#check' ).on( 'click', function() {
+        if( $(this).is(':checked') ){
+            $('#searchFinals').removeAttr('disabled');
+            $('#searchInicio').removeAttr('disabled'); 
+            filtroFecha();
+           
+        } 
+        else {
+            $('#searchInicio').attr('disabled','disabled');
+            $('#searchFinals').attr('disabled','disabled');
+            getCitas(); 
+        }
+    });
+
 
     $("#inputEstado").change(function(){
         var dropDownList = $("#inputEstado option:selected");
@@ -412,8 +549,14 @@ $(document).ready(function(){
 
                 if(response)
                 {
-                    getCitas();         
-                    iniciarFormulario(); 
+                    if(!$("#check").is(':checked')){
+                        getCitas();
+                    }
+                    else{
+                        filtroFecha();
+                    }       
+
+                    iniciarFormCitas(); 
 
                     mostrarSucces("Cita Editada");
 
@@ -513,8 +656,15 @@ $(document).ready(function(){
             data:{asunto: asunto, fecha: fecha, hora:hora, id_usuario:id_usuario},
             success: (response) =>{
                 console.log(response);
-                getCitas();         
-                iniciarFormulario(); 
+
+                if(!$("#check").is(':checked')){
+                    getCitas();
+                }
+                else{
+                    filtroFecha();
+                }
+
+                iniciarFormCitas(); 
 
                 mostrarSucces("Cita Guardada");
 

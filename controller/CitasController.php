@@ -123,6 +123,28 @@
                 
             }
         }
+
+        public function filtroFecha()
+        {
+            if(isset($_POST['inicio']))
+            {
+                $inicio = $_POST['inicio'];
+                $fin = $_POST['fin'];
+
+                $citas = new Citas();
+
+                $query = "SELECT citas.id, citas.asunto, citas.estatus, citas.fecha, citas.hora, citas.id_contactos, contactos.nombre, contactos.apellidos 
+                        FROM citas, contactos 
+                        WHERE citas.id_contactos = contactos.id
+                        AND fecha  BETWEEN '$inicio' AND '$fin'";
+
+
+                $citas = $citas->ejecutarSql($query);
+
+                echo json_encode($citas);
+            }
+
+        }
     }
     
 

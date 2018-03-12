@@ -114,6 +114,21 @@
                 
             }
         }
+
+        public function search()
+        {
+            if(isset($_POST["buscar"]))
+            {
+                $buscar = $_POST["buscar"];
+
+                $query = "SELECT * FROM contactos WHERE nombre LIKE '$buscar%' OR id LIKE '$buscar%' OR apellidos LIKE '$buscar%'" ;
+                $c = new Contacto();
+                $contacto = $c->ejecutarSql($query);
+
+                echo json_encode($contacto);
+                
+            }
+        }
     }
     
 

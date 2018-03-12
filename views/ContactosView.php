@@ -47,12 +47,19 @@
         </form>        
 
     </div>
-
-    <div class="col-lg-6">
+    <div class="col-lg-9" style="margin-top:30px">
         <!--<button id="nuevoContact" type="button" class="btn btn-primary btnmodalContacto" data-toggle="modal" data-target="#modalContacto">Nuevo Contacto</button>-->
         <center>
-            <h2><label class="label label-info">LISTA DE CONTACTOS</label></h2>
+            <div class="col-sm-6 col-md-7">
+                <h2><label class="label label-info">LISTA DE CONTACTOS</label></h2> 
+            </div>
+            <div class="col-sm-6 col-md-5">
+                <input type="text" class="form-control" id="buscarContact" placeholder="Search (id,nombre,apellidos)" onKeyPress="searchContact(this.value)" onKeyUp="searchContact(this.value)">
+            </div>
+                   
+            
         </center>
+        
         <table class="table table-responsive tabla-contactos">
             <tr>
                 <td>ID</td>
